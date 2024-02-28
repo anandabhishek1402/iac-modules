@@ -13,11 +13,11 @@ variable "stages"{
             name = string
             project = string
             deploy_service_account_email = string
-            artifact_storage = optional(string)
-            membership = optional(string)
-            location = optional(string)
+            artifact_storage = string
+            membership = string
+            location = string
         })
-        require_approval = optional(bool, false)
+        require_approval = bool
 
     }))
     default = []
