@@ -4,7 +4,7 @@ locals{
     pipeline_location = "us-central1"
     pipeline_name = var.pipeline_name
     team_tag = var.team_tag
-    stages = var.stages 
+    stages = []
     project_id = "shared-project-verily"
 }
 
