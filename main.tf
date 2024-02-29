@@ -17,7 +17,7 @@ resource "google_clouddeploy_delivery_pipeline" "primary" {
 
   serial_pipeline {
     dynamic "stages" {
-        for_each = {for idx, stage in local.stages: idx => stage }
+        for_each = { for idx, stage in local.stages : idx => stage }
 
         content{
             profiles = [stages.value.skaffold_profile_name]
@@ -30,10 +30,11 @@ resource "google_clouddeploy_delivery_pipeline" "primary" {
 }
 
 resource "google_clouddeploy_target" "primary" {
+  for_each = { for idx, stage in local.stages : idx => stage }
 
     # project = local.project_id
   location          = local.pipeline_location
-  name              = "${loca.team-tag}-${each.vaue.target.name}"
+  name              = "${local.team_tag}-${each.vaue.target.name}"
   description       = "multi-target description"
 
   execution_configs {
@@ -42,7 +43,7 @@ resource "google_clouddeploy_target" "primary" {
     service_account = each.value.target.deploy_service_account_email
     artifact_storage =  coalesce(each.value.target.artifact_storage, local.deafult_artifact_storage)
   }
-  require_approval = false
+  require_approval = each.value.require_approval
 
   dynamic "anthos_cluster"{
     for_each = each.value.target.type == "PRIVATE_GKE" ? [1] : []
