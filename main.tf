@@ -1,3 +1,10 @@
+terraform {
+  experiments = [ module_variable_optional_attrs ]
+
+}
+
+
+
 locals{
     shared_cd_project_id = "shared-deploy@shared-project-verily.iam.gserviceaccount.com"
     deafult_artifact_storage = "gs://shared_artifact_demo"
@@ -34,8 +41,9 @@ resource "google_clouddeploy_target" "primary" {
 
     # project = local.project_id
   location          = local.pipeline_location
-  name              = "${local.team_tag}-${each.vaue.target.name}"
+  name              = "${local.team_tag}-${each.value.target.name}"
   description       = "multi-target description"
+  project = local.project_id
 
   execution_configs {
     usages            = ["RENDER", "DEPLOY"]
@@ -45,10 +53,11 @@ resource "google_clouddeploy_target" "primary" {
   }
   require_approval = each.value.require_approval
 
-  dynamic "anthos_cluster"{
+  dynamic "gke"{
     for_each = each.value.target.type == "PRIVATE_GKE" ? [1] : []
     content {
-      membership = "projects/${each.value.target.project}/locations/global/memberships/${each.value.target.memberships}"
+      # membership = "projects/${each.value.target.project}/locations/global/memberships/${each.value.target.memberships}"
+      cluster = "projects/${each.value.target.project}/locations/${each.value.target.location}/clusters/${each.value.target.name}"
     }
 
   }
